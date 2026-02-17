@@ -1,0 +1,44 @@
+class CitizenAgent:
+    def __init__(self, user_profile):
+        self.user = user_profile
+        # Prawo jest pobierane lokalnie (cache). Brak połączenia z serwerem przy zapytaniach.
+        self.local_law_repo = GitLawRepo.pull_latest(mode="READ_ONLY")
+        self.hud = LegalHUD()
+
+    def simulate_action(self, proposed_contract):
+        """
+        Symulacja (Sandbox): Sprawdza skutki prawne ZANIM użytkownik cokolwiek podpisze.
+        To odpowiednik 'kompilacji próbnej' kodu.
+        """
+        # 1. Tworzenie izolowanego środowiska (Docker/WASM)
+        sandbox = LegalSandbox(environment="LOCAL_PHONE")
+        
+        # 2. Wstrzyknięcie danych użytkownika i umowy
+        simulation_result = sandbox.run(
+            law_code=self.local_law_repo,
+            input_data={
+                "income": self.user.get_encrypted_income(),
+                "contract": proposed_contract
+            }
+        )
+
+        # 3. Analiza Ryzyka (Risk Assessment)
+        if simulation_result.tax_impact > self.user.current_balance:
+            return self.hud.show_alert("CRITICAL: Ten kontrakt spowoduje bankructwo w ciągu 3 miesięcy.")
+        
+        if simulation_result.compliance_score == "STAN_0":
+            return self.hud.show_alert("ILLEGAL: Podpisanie grozi automatyczną karą (Gilotyna Finansowa).")
+
+        return self.hud.show_green_light("SAFE: Podatek do zapłaty: 19%. Zwrot VAT: Tak.")
+
+    def generate_proof_of_compliance(self):
+        """
+        Zero-Knowledge Proof (ZKP).
+        Udowadnia państwu, że użytkownik spełnia wymogi (np. wiek, dochód),
+        NIE ujawniając samych danych.
+        """
+        proof = ZK_Snark.generate(
+            secret=self.user.real_data,
+            claim=lambda x: x.age >= 18 and x.taxes_paid == True
+        )
+        return proof  # Wysyła tylko 'true/false' z kryptograficznym dowodem
