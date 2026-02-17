@@ -1,0 +1,50 @@
+Oto tłumaczenie opisu schematu blokowego na język angielski.
+
+---
+
+**Generate flowchart. Legend and Step Descriptions (for the Drawing):**
+
+**START**
+
+**BLOCK 200: Stream Initiation (Input Draft)**
+The user (Legislator) inputs the text of a new regulation/law into the editor.
+The system detects a save attempt ("Save Attempt").
+
+**BLOCK 201: Vectorization and Parsing (NLP Engine)**
+The NLP module analyzes the text. It converts sentences (e.g., "Everyone has the right to...") into logical rules (IF entity=citizen THEN grant_right=X).
+A "Logical Law Object" is created.
+
+**BLOCK 202: Pattern Retrieval (Reference Load)**
+The system retrieves the "Kernel" (Constitution) from a secure registry.
+The Kernel contains hard parameters (e.g., MAX_TAX_RATE, NO_CENSORSHIP).
+
+**BLOCK 203: Conflict Simulation (Stress Test / Sandbox)**
+The system overlays the Logical Law Object onto the Kernel.
+It tests edge cases.
+Logical question: Does the new rule overwrite or violate a superior rule?
+
+**BLOCK 204: Decision Node (Validation Gate)**
+Decision: Has a critical collision been detected? (YES / NO)
+
+**PATH A (Result: YES - Collision / Unconstitutionality)**
+
+**BLOCK 205a: Kernel Error (Kernel Panic Signal)**
+The system throws a critical exception.
+
+**BLOCK 205b: Write Lock**
+The database mechanism rejects the write transaction (ROLLBACK).
+The law code does not reach the repository. It does not become law.
+
+**END (STOP - REJECTED):**
+Display of error report (e.g., "Violation of Art. 30: Dignity").
+
+**PATH B (Result: NO - Compliance)**
+
+**BLOCK 206a: Positive Validation (Integrity OK)**
+The system assigns a unique hash (checksum) to the verified text.
+
+**BLOCK 206b: Write Permission (Commit Allow)**
+Opening the gate to the repository (GitLawRepo).
+
+**BLOCK 207: Deployment (Merge/Deploy)**
+The new law is saved and becomes effective.
