@@ -1,0 +1,66 @@
+class ConsensusValidator:
+    def __init__(self):
+        self.pki_ledger = PublicKeyInfrastructure() # Rejestr kluczy publicznych obywateli/sędziów
+        self.blockchain_voting = VotingChain()
+
+    def validate_merge_request(self, pull_request):
+        """
+        Strażnik bramy (Gatekeeper) dla zmian w Jądrze Systemu.
+        Wymusza większość kwalifikowaną 2/3 (Constitutional Hard-Lock).
+        """
+        # 1. Sprawdzenie zakresu zmian
+        if pull_request.target_module == "CONSTITUTIONAL_KERNEL":
+            print("ALERT: Wykryto próbę modyfikacji Jądra. Uruchamianie protokołu konsensusu...")
+            return self._run_referendum_protocol(pull_request)
+        
+        # Dla zwykłych ustaw wystarczy standardowa procedura
+        return "STANDARD_PROCEDURE"
+
+    def _run_referendum_protocol(self, proposal):
+        # Definicja grupy uprawnionej (np. Sędziowie TK lub Wszyscy Obywatele)
+        voters_group = self.pki_ledger.get_group("CITIZENS_ACTIVE")
+        required_threshold = len(voters_group) * (2/3) # Próg 66.6%
+
+        # Otwarcie okna czasowego na podpisywanie
+        proposal_hash = Crypto.sha256(proposal.code_diff)
+        print(f"Oczekiwanie na podpisy dla hash: {proposal_hash}...")
+
+        # Symulacja zbierania głosów z sieci rozproszonej
+        collected_signatures = self.blockchain_voting.collect_votes(proposal_hash, timeout="72h")
+
+        # 2. Audyt kryptograficzny głosów
+        valid_votes = 0
+        for vote in collected_signatures:
+            # Weryfikacja: Czy ten podpis pasuje do tego obywatela i do tego hasha zmiany?
+            if Crypto.verify_signature(vote.public_key, vote.signature, proposal_hash):
+                valid_votes += 1
+
+        # 3. Decyzja binarna
+        if valid_votes >= required_threshold:
+            print(f"SUKCES: Zebrano {valid_votes} ważnych podpisów. Blokada zdjęta.")
+            return self._execute_merge(proposal)
+        else:
+            # Odrzucenie bez możliwości odwołania
+            raise ConsensusError(f"PORAŻKA: Uzyskano tylko {valid_votes}/{required_threshold}. Zmiana odrzucona.")
+
+    def _execute_merge(self, proposal):
+        # Atomowe wdrożenie zmiany
+        GitLawRepo.unlock_branch("MAIN_KERNEL")
+        GitLawRepo.merge(proposal)
+        GitLawRepo.lock_branch("MAIN_KERNEL") # Natychmiastowe ponowne założenie blokady
+        return "KERNEL_UPDATED"
+
+# ---------------------------------------------------------
+# AKTUALIZACJA KLASY 'LEX ARCHITECT' O WALIDATOR
+# ---------------------------------------------------------
+class LexArchitect:
+    def deploy_law(self, draft_code):
+        # ... (wcześniejsze etapy: Sandbox, Unit Testy) ...
+
+        # NOWOŚĆ: Krok finalny przed wdrożeniem
+        consensus_status = System.consensus_validator.validate_merge_request(draft_code)
+
+        if consensus_status == "KERNEL_UPDATED":
+            print("Zmiana Konstytucji weszła w życie.")
+        elif consensus_status == "STANDARD_PROCEDURE":
+             GitLawRepo.merge_to_main(draft_code)
