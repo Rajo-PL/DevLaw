@@ -1,0 +1,91 @@
+Jako Wirtualny Kompilator Systemu DevLaw, przeanalizowałem podany przez Ciebie fragment tradycyjnego przepisu (Art. 41 ust. 12 ustawy o VAT).
+
+Oto wynik procesu kompilacji:
+
+### 🔴 STATUS KOMPILACJI: BUILD FAILED (Błąd Krytyczny)
+Kod zawiera błędy składniowe (*Syntax Errors*), nieostre definicje oraz brakujące parametry, które uniemożliwiają deterministyczne wykonanie w systemie DevLaw.
+
+---
+
+### 1. RAPORT BŁĘDÓW (DEBUGGING LOG)
+
+**Błąd 1: Nieostre pojęcia (Ambiguity Error)**
+*   **Analiza:** Używasz terminów: *„remont, modernizacja, termomodernizacja, przebudowa”*. W tradycyjnym prawie granica między „remontem” (odtworzeniem stanu) a „modernizacją” (ulepszeniem) jest płynna i generuje tysiące sporów sądowych ( interpretacyjnych).
+*   **Wymóg DevLaw:** System nie akceptuje słów. Wymaga **Biblioteki Definicji**. Każda z tych czynności musi być konkretnym kodem czynności (np. `OP_CODE_RENOVATION_01`), zdefiniowanym w centralnej bibliotece budowlanej.
+
+**Błąd 2: Brak parametru liczbowego (Missing Parameter)**
+*   **Analiza:** Pojęcie *„budownictwo objęte społecznym programem mieszkaniowym”* jest w tym fragmencie „czarną skrzynką”. Kompilator nie wie, gdzie kończy się „społeczne”, a zaczyna „luksusowe”.
+*   **Wymóg DevLaw:** Należy zdefiniować twardy parametr powierzchni (`area_limit`). W polskim prawie jest to zazwyczaj 150 m² lub 300 m². Bez tej wartości algorytm nie może obliczyć podatku, zwracając błąd `NULL VALUE`.
+
+**Błąd 3: Brak obsługi warunku brzegowego (Edge Case Exception)**
+*   **Analiza:** Co się dzieje, gdy dom ma 160 m², a limit wynosi 150 m²? Tradycyjny przepis tego nie wyjaśnia wprost w tym ustępie.
+*   **Wymóg DevLaw:** Algorytm musi obsłużyć ten wyjątek. Zazwyczaj stosuje się **proporcję** (metraż do 150 m² = 8%, nadwyżka = 23%). Kod musi zawierać instrukcję `ELSE IF` dla nadwyżki.
+
+---
+
+### 2. REFAKTORYZACJA (Tłumaczenie na Kod DevLaw)
+
+Poniżej przedstawiam, jak ten przepis wyglądałby po „naprawie” przez Lex-Architekta i wdrożeniu do systemu jako **Smart Contract Podatkowy**.
+
+```python
+# IMPORT BIBLIOTEK (Moduły systemowe)
+import Lib_Tax_Rates as Tax          # Stawki VAT
+import Lib_Building_Specs as Build   # Definicje budynków
+import Lib_Social_Policy as Social   # Parametry polityki społecznej
+
+# DEFINICJA PARAMETRÓW (Stałe)
+CONST_SOCIAL_LIMIT_FLAT = 150.00     # m2
+CONST_SOCIAL_LIMIT_HOUSE = 300.00    # m2
+REDUCED_RATE = 0.08                  # 8%
+STANDARD_RATE = 0.23                 # 23%
+
+# FUNKCJA GŁÓWNA (Algorytm obliczania stawki)
+def calculate_vat_for_service(service_type, building_type, area_m2):
+
+    # 1. Walidacja czynności (Czy usługa jest na liście?)
+    valid_services = [
+        Build.CONSTRUCTION,
+        Build.RENOVATION,
+        Build.MODERNIZATION,
+        Build.THERMAL_UPGRADE
+    ]
+
+    if service_type NOT in valid_services:
+        return STANDARD_RATE # Domyślna stawka 23% dla innych usług
+
+    # 2. Ustalenie limitu dla danego typu budynku
+    if building_type == Build.TYPE_FLAT:
+        limit = CONST_SOCIAL_LIMIT_FLAT
+    elif building_type == Build.TYPE_HOUSE:
+        limit = CONST_SOCIAL_LIMIT_HOUSE
+    else:
+        return "ERROR: Unknown Building Type"
+
+    # 3. Logika obliczania stawki (IF-THEN-ELSE)
+    if area_m2 <= limit:
+        # Pełna ulga
+        return {
+            "rate": REDUCED_RATE,
+            "tax_base": area_m2
+        }
+    else:
+        # Obsługa wyjątków (Split Payment logic)
+        # Część objęta ulgą (do limitu) + nadwyżka (standard)
+        excess_area = area_m2 - limit
+        return {
+            "part_1": {"rate": REDUCED_RATE, "tax_base": limit},
+            "part_2": {"rate": STANDARD_RATE, "tax_base": excess_area}
+        }
+```
+
+---
+
+### 3. WYNIK DLA OBYWATELA (User Experience)
+
+W systemie DevLaw nie musisz czytać tego kodu ani ustawy.
+
+1.  **Legal HUD:** Gdy kupujesz usługę remontową, Twój **Legal HUD** (w telefonie lub okularach AR) skanuje metraż mieszkania z księgi wieczystej (Single Source of Truth).
+2.  **Automatyzacja:** Jeśli mieścisz się w limicie, system w czasie rzeczywistym wystawia fakturę ze stawką 8%. Pole "Stawka VAT" jest zablokowane na wartości 8% (nie możesz się pomylić).
+3.  **Brak Interpretacji:** Urzędnik nie może zakwestionować, czy to był "remont" czy "modernizacja", ponieważ kod usługi został pobrany z biblioteki API wykonawcy.
+
+**Czy mam skompilować ten kod i przesłać go do weryfikacji w wirtualnym "Sandboxie" (środowisku testowym), aby sprawdzić jego wpływ na budżet?**
