@@ -1,0 +1,93 @@
+Jako Wirtualny Kompilator Systemu DevLaw, przeanalizowałem wprowadzony przez Ciebie tradycyjny tekst Kodeksu karnego (Art. 1 i Art. 2).
+
+Oto wynik procesu kompilacji i walidacji w architekturze DevLaw:
+
+### 🔴 STATUS KOMPILACJI: BUILD FAILED (Błędy Logiczne)
+Kod zawiera **zmienne niezdefiniowane** (nieostrość pojęciowa) oraz wymaga integracji z modułem **Human-in-the-Loop** (obsługa wyjątków). Przepis w tej formie jest niemożliwy do automatycznej egzekucji przez system.
+
+---
+
+### 1. RAPORT BŁĘDÓW (DEBUGGING LOG)
+
+**Analiza Art. 1 § 1 (Nullum crimen sine lege): `PASSED` (Zgodność)**
+*   **Logika:** Zasada, że czyn musi być zabroniony w momencie popełnienia, jest w pełni kompatybilna z systemem **Git-Law** (Wersjonowanie).
+*   **Implementacja:** System sprawdzi *timestamp* (znacznik czasu) czynu i porówna go z wersją kodu prawa obowiązującą w tamtej nanosekundzie (konkretny *commit* w repozytorium),.
+
+**Analiza Art. 1 § 2 (Szodliwość społeczna): `CRITICAL ERROR` (Ambiguity)**
+*   **Błąd:** Pojęcie *"społeczna szkodliwość jest znikoma"* jest wartością subiektywną, niemożliwą do przetworzenia przez algorytm binarny (0 lub 1). Dla maszyny "znikoma" to `NULL` lub błąd logiczny.
+*   **Wymóg DevLaw:** Konieczna parametryzacja. Należy zdefiniować próg liczbowy (np. `harm_score < 0.05` lub `value < 500 PLN`). Bez tego system zawiesi się na każdej drobnej sprawie,.
+
+**Analiza Art. 1 § 3 (Wina): `WARNING` (Exception Handling)**
+*   **Błąd:** *"Przypisanie winy"* to proces psychologiczny, trudny do pełnej automatyzacji.
+*   **Wymóg DevLaw:** To klasyczny **Wyjątek (*Exception*)**. System może ocenić fakty (ślad cyfrowy), ale ocenę "zamiaru" w skomplikowanych przypadkach musi zatwierdzić **Sędzia-Audytor** (Human in the Loop). Algorytm nie może samodzielnie orzec o winie bez weryfikacji warunków brzegowych,.
+
+**Analiza Art. 2 (Zaniechanie / Gwarant): `PASSED` (Logic Ready)**
+*   **Logika:** *"Ciążył prawny, szczególny obowiązek"* jest łatwe do zakodowania.
+*   **Implementacja:** System sprawdza atrybuty użytkownika w bazie danych. Czy `User_Role == GUARDIAN` (np. ratownik, rodzic)? Jeśli tak, brak akcji (`Action == NULL`) generuje odpowiedzialność,.
+
+---
+
+### 2. REFAKTORYZACJA (Tłumaczenie na Kod DevLaw)
+
+Oto jak Inżynier Prawa (Lex-Architekt) przepisałby te zasady na wykonywalny algorytm (pseudokod Python/Solidity), usuwając błędy logiczne:
+
+```python
+# IMPORT MODUŁÓW SYSTEMOWYCH
+import Lib_Penal_Code as Penal
+import Lib_Git_Law as History
+import Lib_User_Roles as Roles
+
+# DEFINICJE PARAMETRÓW (Eliminacja nieostrości z §2)
+CONST_HARM_THRESHOLD = 100.00  # Punkty szkodliwości (zamiast "znikoma")
+
+def check_criminal_liability(user_id, act_id, timestamp):
+
+    # KROK 1: Wersjonowanie (Art. 1 § 1)
+    # Pobierz wersję prawa z momentu zdarzenia (Git Commit Hash)
+    active_law = History.get_law_version(timestamp)
+
+    if act_id NOT in active_law.prohibited_acts:
+        return "NO_CRIME: Act not prohibited at timestamp"
+
+    # KROK 2: Analiza Szkodliwości (Naprawa Art. 1 § 2)
+    # Wyliczenie szkody na podstawie twardych danych, nie opinii
+    harm_value = Penal.calculate_damage(act_id)
+
+    if harm_value < CONST_HARM_THRESHOLD:
+        return "NO_CRIME: Harm below threshold (Auto-Dismiss)"
+
+    # KROK 3: Weryfikacja Zaniechania (Art. 2)
+    if act_id.type == "OMISSION":
+        # Sprawdzenie czy user miał status "Gwaranta" w systemie
+        user_role = Roles.get_status(user_id, timestamp)
+        if user_role != "LEGAL_GUARDIAN":
+            return "NO_CRIME: No legal duty to act"
+
+    # KROK 4: Wina i Human-in-the-Loop (Art. 1 § 3)
+    # Algorytm flaguje sprawę do audytu sędziowskiego
+    try:
+        digital_trace = Penal.analyze_intent_trace(user_id) # Ślad cyfrowy
+        if digital_trace.intent == "CLEAR":
+            return "LIABILITY_CONFIRMED"
+        else:
+            # Jeśli algorytm nie ma pewności co do winy -> WYJĄTEK
+            raise NeedsHumanAudit("Niejasny zamiar sprawcy")
+
+    except NeedsHumanAudit:
+        # Przekazanie do Sędziego-Audytora (Human in the Loop)
+        return System.send_to_judge(user_id, context="INTENT_VERIFICATION")
+```
+
+---
+
+### 3. SYMULACJA DZIAŁANIA (User Experience)
+
+1.  **Sytuacja:** Ukradłeś batonik w sklepie (Wartość 3 PLN).
+    *   **Stare Prawo:** Policjant zastanawia się, czy to "znikoma szkodliwość". Może sprawa trafi do sądu.
+    *   **DevLaw:** Algorytm widzi `harm_value = 3`. Jest to mniej niż `CONST_HARM_THRESHOLD` (100). System **automatycznie umarza sprawę** w ułamku sekundy, wysyłając Ci tylko pouczenie na Legal HUD. Brak biurokracji,.
+
+2.  **Sytuacja:** Ratownik nie udzielił pomocy (Zaniechanie).
+    *   **DevLaw:** System widzi w rejestrze, że w momencie zdarzenia Twój status to `ACTIVE_GUARDIAN`. Rejestr GPS pokazuje, że byłeś w pobliżu, a sensor biometryczny, że nie podjąłeś akcji.
+    *   **Wynik:** Odpowiedzialność karna zostaje aktywowana automatycznie, chyba że Sędzia-Audytor znajdzie w logach błąd systemu ("Debug Mode"),.
+
+**Czy mam zatwierdzić ten kod (`git commit`) i wdrożyć go do gałęzi testowej?**
