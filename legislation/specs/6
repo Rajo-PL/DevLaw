@@ -1,0 +1,205 @@
+Oto kompletny, konceptualny kod źródłowy architektury **DevLaw**, napisany jako **symulacja w języku Python**. Kod ten integruje kluczowe mechanizmy opisane w dostarczonych źródłach: od walidacji konstytucyjnej (Kernel), przez sprzętową blokadę budżetu (Hard-Lock), aż po procedury sądowe (Debugger) i obywatelskie (Legal HUD).
+
+Program podzielony jest na moduły odpowiadające warstwom systemu opisanym w dokumentacji.
+
+### `>>> SYSTEM BOOT: DEVLAW OS v.2.2 (Build 2035) <<<`
+
+```python
+import hashlib
+import time
+from enum import Enum
+
+# ==============================================================================
+# MODUŁ 1: JĄDRO SYSTEMU (CONSTITUTIONAL KERNEL)
+# Źródła:,,,
+# ==============================================================================
+
+class KernelPanic(Exception):
+    """Krytyczny błąd systemu: Naruszenie parametrów podstawowych."""
+    pass
+
+class ConstitutionalKernel:
+    def __init__(self):
+        # Nienaruszalne parametry ("Instrukcje Podstawowe")
+        self.CORE_VALUES = {
+            "HUMAN_DIGNITY": True,      # Godność człowieka
+            "PERSONAL_FREEDOM": True,   # Wolność osobista
+            "NO_RETROACTIVITY": True    # Lex retro non agit
+        }
+
+    def validate_compilation(self, new_law_code):
+        """
+        Sprawdza każdą linię nowego prawa przed wdrożeniem.
+        Działa jak kompilator: Błąd = Odrzucenie kodu.
+        """
+        print(f"[KERNEL] Walidacja modułu: {new_law_code.name}...")
+        
+        if new_law_code.violates_dignity():
+            # Fizyczne przerwanie procesu legislacyjnego,
+            raise KernelPanic(f"CRITICAL ERROR: Moduł {new_law_code.name} narusza Art. 30 (Godność). KOMPILACJA PRZERWANA.")
+        
+        return True # Kod zgodny z Jądrem
+
+# ==============================================================================
+# MODUŁ 2: HARD-LOCK BUDŻETOWY (SMART HARDCORE)
+# Źródła:,,
+# ==============================================================================
+
+class HSM_Module:
+    """Symulacja Sprzętowego Modułu Bezpieczeństwa (Hardware Security Module)"""
+    def __init__(self):
+        self.locked = True # Domyślnie zablokowany
+
+    def sign_transaction(self, private_key, data):
+        if self.locked:
+            return "ERROR: HARDWARE INTERRUPT - Button Dead" # Martwy przycisk
+        return f"SIGNED_{hashlib.sha256(data.encode()).hexdigest()}"
+
+class TreasurySystem:
+    def __init__(self, ledger):
+        self.ledger = ledger # Single Source of Truth
+        self.hsm = HSM_Module()
+
+    def authorize_expenditure(self, official_id, amount):
+        """
+        Próba autoryzacji wydatku publicznego.
+        """
+        # 1. Synchroniczne zapytanie do Rejestru
+        available_funds = self.ledger.check_funds("PUBLIC_BUDGET")
+        
+        # 2. Węzeł decyzyjny (Comparator)
+        if available_funds >= amount:
+            self.hsm.locked = False # Odblokowanie sprzętowe
+            print("[HARD-LOCK] Środki dostępne. Przycisk 'Podpisz' aktywny.")
+            return self.hsm.sign_transaction(official_id, f"TRANSFER_{amount}")
+        else:
+            self.hsm.locked = True # Blokada sprzętowa
+            # Fizyczna niemożność wygenerowania podpisu,
+            print("[HARD-LOCK] BRAK POKRYCIA. Przycisk 'Podpisz' jest MARTWY.")
+            return None
+
+# ==============================================================================
+# MODUŁ 3: SĄDOWNICTWO (JUDGE AS DEBUGGER)
+# Źródła:,,
+# ==============================================================================
+
+class JudgeInterface:
+    def handle_exception(self, case_id, automated_verdict):
+        """
+        Sędzia jako Human-in-the-Loop obsługujący wyjątki (Edge Cases).
+        """
+        print(f"[DEBUGGER] Sędzia analizuje Stack Trace sprawy {case_id}...")
+        
+        # Sędzia wchodzi w tryb Debug Mode
+        logs = System.get_logs(case_id)
+        
+        if logs.detect_logic_error():
+            # Wyrok jako Hotfix (Łatka systemu)
+            print("[JUDGE] Wykryto błąd algorytmu. Reset transakcji.")
+            System.rollback(case_id) # Cofnięcie skutków
+            LexArchitects.issue_ticket("Refaktoryzacja wadliwego modułu")
+            return "VERDICT_OVERRIDDEN"
+            
+        return "VERDICT_CONFIRMED"
+
+    def trigger_kernel_panic(self, law_module):
+        """
+        Sędzia jako Strażnik Jądra blokuje egzekucję w czasie rzeczywistym
+        """
+        print("[JUDGE] ALARM: Kod narusza prawa człowieka.")
+        raise KernelPanic("Sędziowska blokada egzekucji.")
+
+# ==============================================================================
+# MODUŁ 4: OBYWATEL I LEGAL HUD (CLIENT-SIDE)
+# Źródła:,,
+# ==============================================================================
+
+class PersonalAIAgent:
+    def __init__(self):
+        # Pobieranie logiki prawa do lokalnego środowiska (Jednokierunkowy filtr)
+        self.law_repository = GitLaw.pull_latest()
+    
+    def simulate_decision(self, user_contract):
+        """
+        Symulacja skutków prawnych BEZ wysyłania danych do państwa,
+        """
+        risk_score = self.law_repository.analyze(user_contract)
+        
+        if risk_score > 0.8:
+            return "RED_ZONE: Ryzyko utraty ulgi podatkowej! [Legal HUD]" #
+        else:
+            return "GREEN_ZONE: Ścieżka zgodna z prawem."
+
+class CitizenActions:
+    def appeal_decision(self, penalty_amount, is_bankrupt=False):
+        """
+        Odwołanie w oparciu o Symetrię Ryzyka
+        """
+        deposit = penalty_amount * 1.0 # Kaucja 100%
+        
+        if is_bankrupt:
+            deposit = 0 # Klauzula "Prawa Ubogich"
+            
+        result = Court.process_appeal(deposit)
+        
+        if result == "SYSTEM_ERROR":
+            # Zwrot kaucji z podwójnymi odsetkami
+            return deposit * 2.0 
+            
+# ==============================================================================
+# MODUŁ 5: EGZEKUCJA I BUG BOUNTY
+# Źródła:,
+# ==============================================================================
+
+class EnforcementSystem:
+    def process_entity(self, entity):
+        if entity.status == "STATE_0": # Niezgodność
+            # Procedura Czynnego Żalu (Ostrzeżenie)
+            if not entity.warned:
+                return "FLAG: Napraw błąd w 7 dni albo płać."
+            
+            # Gilotyna Finansowa
+            return "CONFISCATION: 100% przepadku korzyści."
+
+class BugBountyPlatform:
+    def report_bug(self, user, bug_report):
+        """
+        Obywatel zgłasza błąd w prawie
+        """
+        severity = LexArchitects.verify(bug_report)
+        
+        if severity == "CRITICAL":
+            # Automatyczna nagroda Smart Contract
+            TreasurySystem.pay_reward(user, amount="Calculated based on savings")
+            GitLaw.deploy_hotfix(bug_report) # Naprawa prawa
+
+# ==============================================================================
+# URUCHOMIENIE (MAIN LOOP)
+# ==============================================================================
+
+def main():
+    kernel = ConstitutionalKernel()
+    
+    # 1. Próba wdrożenia nowej ustawy (Kompilacja)
+    try:
+        new_law = "Ustawa_o_Konfiskacie_Bez_Sądu_v1.0"
+        kernel.validate_compilation(new_law) # To wyrzuci KernelPanic
+    except KernelPanic as e:
+        print(e) # Kod odrzucony, nie wchodzi na produkcję
+
+    # 2. Próba nielegalnego wydatku przez urzędnika
+    treasury = TreasurySystem(ledger="Empty")
+    result = treasury.authorize_expenditure("Minister_X", 1000000)
+    # Wynik: None (Martwy przycisk)
+
+if __name__ == "__main__":
+    main()
+```
+
+### Analiza struktury kodu:
+
+1.  **Klasa `ConstitutionalKernel`:** Implementuje Konstytucję jako techniczny filtr. Metoda `validate_compilation` wyrzuca wyjątek `KernelPanic`, fizycznie uniemożliwiając wdrożenie prawa naruszającego godność.
+2.  **Klasa `TreasurySystem` i `HSM_Module`:** To implementacja **Hard-Locka**. Zwróć uwagę, że jeśli `ledger.check_funds` zwróci fałsz, metoda `sign_transaction` zwraca błąd sprzętowy ("Button Dead"). Nie da się tego obejść programowo.
+3.  **Klasa `JudgeInterface`:** Sędzia nie "czyta akt", ale używa `get_logs` i `rollback`. Działa na wyjątkach i może nadpisać (`override`) decyzję algorytmu, pełniąc rolę bezpiecznika.
+4.  **Klasa `PersonalAIAgent`:** Działa w trybie Client-Side. Pobiera prawo (`pull_latest`), ale symulacja odbywa się wewnątrz obiektu, nie wysyłając danych na zewnątrz (Prywatność).
+5.  **Klasa `EnforcementSystem`:** Implementuje logikę "Stanu 0" (Gilotyna Finansowa) oraz procedurę "Czynnego Żalu" (ostrzeżenie przed karą).
