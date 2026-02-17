@@ -1,0 +1,183 @@
+Oto szczegółowe rozwinięcie 5 kluczowych struktur kodu systemu DevLaw. Każda klasa została rozbudowana o konkretne metody i logikę wynikającą z dostarczonych źródeł, pokazując, jak mechanizmy te działają "pod maską".
+
+---
+
+### 1. Klasa `ConstitutionalKernel` (Jądro Systemu)
+Ta struktura odpowiada za **"Jądro Systemu"**. Jest to filtr, przez który musi przejść każdy nowy kawałek kodu prawa. Działa na zasadzie zero-jedynkowej walidacji zgodności z wartościami podstawowymi.
+
+```python
+class ConstitutionalKernel:
+    def __init__(self):
+        # Parametry nienaruszalne ("Instrukcje Podstawowe")
+        self.CORE_PARAMS = {
+            "HUMAN_DIGNITY": "CRITICAL_VALUE", # Godność człowieka
+            "PERSONAL_FREEDOM": "CRITICAL_VALUE",
+            "NO_RETROACTIVITY": True           # Lex retro non agit
+        }
+
+    def validate_compilation(self, draft_law_object):
+        """
+        Walidacja semantyczna i logiczna nowego prawa przed wdrożeniem.
+        """
+        # KROK 1: Wektoryzacja tekstu ustawy na obiekty logiczne
+        logic_map = NLP_Engine.vectorize(draft_law_object) #
+
+        # KROK 2: Symulacja konfliktu (Conflict Simulation)
+        # Nakładamy nowy obiekt na Jądro w poszukiwaniu kolizji
+        for rule in logic_map.rules:
+            if rule.violates(self.CORE_PARAMS["HUMAN_DIGNITY"]):
+                # KROK 3: Sprzętowe przerwanie kompilacji
+                return self.trigger_kernel_panic(rule) #,
+
+        return "BUILD_SUCCESS"
+
+    def trigger_kernel_panic(self, faulty_rule):
+        """
+        Procedura Kernel Panic: Fizyczna blokada zapisu (Write Lock).
+        Kod nie trafia do repozytorium.
+        """
+        System.storage.lock_write_access()
+        raise Exception(f"KERNEL PANIC: Naruszenie godności w module {faulty_rule.id}. Kompilacja odrzucona.") #,
+```
+**Kluczowa logika:** Metoda `trigger_kernel_panic` nie jest tylko ostrzeżeniem – ona fizycznie blokuje dostęp do zapisu w bazie danych (`Master Database`), uniemożliwiając wdrożenie wadliwego prawa.
+
+---
+
+### 2. Klasa `LexArchitect` (Legislacja Inżynieryjna)
+Ta klasa symuluje środowisko pracy Lex-Architekta. Zastępuje tradycyjny proces legislacyjny procesem inżynieryjnym (CI/CD dla prawa).
+
+```python
+class LexArchitect:
+    def create_legislation_module(self, draft_code):
+        # KROK 1: Defragmentacja Logiki (Parsowanie)
+        # Usuwanie słów nieostrych ("niezwłocznie", "rażący")
+        # Zamiana na parametry (np. time_limit = 24h)
+        clean_code = self.remove_ambiguity(draft_code) #,
+
+        # KROK 2: Sandbox Testing (Piaskownica)
+        # Symulacja warunków brzegowych (Stress-Testy)
+        try:
+            LegalSandbox.run_simulation(
+                code=clean_code, 
+                scenarios=["INFLATION_1000_PERCENT", "NETWORK_BLACKOUT"]
+            ) #,
+        except LogicError as e:
+            return f"BUILD FAILED: Popraw błąd logiczny: {e}"
+
+        # KROK 3: Wersjonowanie (Git-Law)
+        # Każda zmiana to 'commit' z opisem autora
+        commit_hash = GitLawRepo.commit(
+            branch="feature/new-tax-law",
+            message="Refaktoryzacja modułu VAT v.4.2",
+            author_id=self.architect_id
+        ) #,
+
+        return commit_hash
+```
+**Kluczowa logika:** System nie pozwala na "commit" (zapisanie zmian), jeśli kod nie przeszedł testów w `LegalSandbox` (np. symulacji hiperinflacji). To eliminuje "dziurawe" ustawy,.
+
+---
+
+### 3. Klasa `TreasuryHardLock` (Egzekucja i Hard-Lock)
+To implementacja **"Smart Hardcore"**. Klasa ta kontroluje wydatki publiczne i egzekwuje prawo poprzez fizyczne blokady interfejsu (Hard-Lock) oraz automatyczne kary (Gilotyna Finansowa).
+
+```python
+class TreasuryHardLock:
+    def authorize_transaction(self, official_id, amount):
+        # KROK 1: Zapytanie do Jednego Źródła Prawdy (Single Source of Truth)
+        ledger_status = PublicLedger.check_funds(official_id) #,
+
+        if ledger_status < amount:
+            # SCIEŻKA NEGATYWNA: Hardware Interrupt
+            # Sygnał do modułu HSM (Hardware Security Module) blokujący dostęp do klucza
+            HSM_Module.send_interrupt_signal()
+            
+            # Przycisk w interfejsie staje się "martwy" (wyszarzony)
+            return Interface.disable_button("SIGN_CONTRACT") #,
+        
+        else:
+            # ŚCIEŻKA POZYTYWNA
+            PublicLedger.reserve_funds(amount)
+            return HSM_Module.sign(official_id)
+
+class TaxEnforcement:
+    def assess_entity(self, entity):
+        if entity.status == "STAN_0": # Niezgodność / Szara strefa
+            # Gilotyna Finansowa: 100% przepadku korzyści
+            confiscation_amount = entity.revenue * 1.0 
+            disallowed_costs = True # Brak kosztów uzyskania przychodu
+            return self.execute_confiscation(confiscation_amount) #,
+            
+        elif entity.status == "STAN_1":
+            # Nagroda: Turbo-Zwrot VAT
+            return self.process_refund(speed="INSTANT") #
+```
+**Kluczowa logika:** W metodzie `authorize_transaction` brak środków powoduje sprzętowe przerwanie (`HSM interrupt`). Nie da się tego obejść programowo ("kliknąć na siłę"), bo klucz kryptograficzny jest fizycznie niedostępny.
+
+---
+
+### 4. Klasa `JudgeDebugger` (Sądownictwo jako Audyt)
+Sędzia działa tu jako "człowiek w pętli" (Human-in-the-loop). Jego rolą jest obsługa wyjątków (`Exceptions`) i naprawianie błędów systemu.
+
+```python
+class JudgeDebugger:
+    def handle_appeal(self, case_id, deposit_paid):
+        # KROK 1: Weryfikacja Symetrii Ryzyka
+        if not deposit_paid and not self.check_poverty_clause(case_id):
+            return "REJECTED: Brak kaucji 100%" #,
+
+        # KROK 2: Analiza Logów (Debug Mode)
+        # Sędzia nie czyta akt, tylko Stack Trace
+        logs = System.get_stack_trace(case_id) #,
+
+        if logs.error_type == "EDGE_CASE_EXCEPTION":
+            # Sędzia wykrył błąd algorytmu
+            
+            # A. Naprawa wstecz (Dla obywatela)
+            self.override_decision(case_id, "ANULOWANIE KARY")
+            Treasury.refund_deposit(multiplier=2.0) # Zwrot kaucji z nawiązką
+            
+            # B. Naprawa w przód (Dla systemu - Hotfix)
+            BugReport.create(
+                priority="CRITICAL",
+                message="Pętla logiczna w module podatkowym",
+                suggested_fix="Refaktoryzacja linii 402"
+            ) #,
+            
+            return "VERDICT: SYSTEM_ERROR_FIXED"
+```
+**Kluczowa logika:** Metoda `handle_appeal` pokazuje mechanizm finansowy (kaucja vs podwójny zwrot). Sędzia generuje `BugReport`, który staje się "poprawką" dla systemu, a nie tylko wyrokiem w sprawie.
+
+---
+
+### 5. Klasa `CitizenAgent` (Prywatność i Legal HUD)
+To kod działający po stronie obywatela ("Client-Side"). Zapewnia prywatność poprzez architekturę "jednokierunkowego filtra".
+
+```python
+class CitizenAgent:
+    def __init__(self):
+        # Pobieranie logiki prawa do lokalnego środowiska
+        # Nie wysyłamy danych usera do chmury!
+        self.law_logic = GitLawRepo.pull_latest() #,
+
+    def simulate_decision(self, user_contract):
+        """
+        Lokalna symulacja skutków prawnych (Sandbox).
+        """
+        # Symulacja w izolowanym środowisku wirtualnym
+        simulation_result = LocalEngine.run(user_contract, self.law_logic) #,
+
+        # Generowanie widoku dla Legal HUD
+        if simulation_result.risk_level == "HIGH":
+            return {
+                "hud_color": "RED_ZONE",
+                "message": "Ryzyko utraty ulgi! Nie podpisuj.",
+                "suggestion": "Czy wygenerować patch naprawczy?" #
+            }
+        else:
+            return {
+                "hud_color": "GREEN_ZONE",
+                "message": "Ścieżka zgodna z prawem (Compliance OK)"
+            } #
+```
+**Kluczowa logika:** Metoda `simulate_decision` odbywa się lokalnie (`LocalEngine`). Państwo udostępnia logikę (`pull_latest`), ale nie widzi, jakie dane przetwarza obywatel ("brak raportowania"),.
