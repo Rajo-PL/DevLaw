@@ -1,0 +1,40 @@
+class JudgeDebugger:
+    def __init__(self):
+        self.access_level = "ROOT_AUDIT"
+        
+    def review_case(self, case_id):
+        """
+        Sędzia nie czyta akt papierowych. Sędzia analizuje Stack Trace.
+        """
+        # Pobranie logów wykonania algorytmu, który wydał wyrok
+        execution_logs = System.get_logs(case_id, mode="VERBOSE")
+        
+        # Wizualizacja ścieżki decyzyjnej (dlaczego algorytm podjął taką decyzję?)
+        LegalHUD.visualize_decision_tree(execution_logs)
+        
+        return self.console_interface(case_id)
+
+    def override_verdict(self, case_id, new_decision, justification):
+        """
+        Hotfix: Ręczna, jednorazowa zmiana decyzji w konkretnej sprawie.
+        """
+        System.force_state_change(case_id, new_decision)
+        
+        # Kluczowa innowacja: Wyrok jako Zgłoszenie Błędu (Bug Report)
+        bug_report = {
+            "error_type": "LOGIC_FLAW",
+            "context": justification,
+            "suggested_fix": "Zmień parametr dochodu dla samotnych matek"
+        }
+        
+        # Automatyczne wysłanie Pull Requesta do legislacji
+        LexArchitect.create_issue(repo="SocialWelfare_Law", report=bug_report)
+        
+        return "VERDICT_OVERRIDDEN_AND_REPORTED"
+
+    def kernel_panic_trigger(self, law_module):
+        """
+        Gdy sędzia odkryje, że algorytm łamie prawa człowieka (ConstitutionalKernel).
+        """
+        System.stop_process(law_module) # Natychmiastowe zatrzymanie stosowania prawa
+        Alert.broadcast("CRITICAL: Wykryto niekonstytucyjny algorytm. Procedura naprawcza.")
