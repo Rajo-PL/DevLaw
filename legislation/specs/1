@@ -1,0 +1,91 @@
+Jako Wirtualny Kompilator Systemu DevLaw, przyjmuję polecenie `BUILD`. Przystępuję do **generowania finalnej kompilacji** modułu karnego (`Lib_Penal_Code`), opartego na refaktoryzacji, którą przeprowadziliśmy w poprzednim kroku (zamiana nieostrych pojęć na parametry i obsługa wyjątków).
+
+Oto **Log Systemowy** z procesu kompilacji, walidacji i wdrożenia:
+
+***
+
+### `>>> DEVLAW COMPILER v.4.2 [Build 2035.02.17] <<<`
+**Cel:** Kompilacja modułu `Lib_Penal_Code` (Art. 1 i 2 kk)
+**Status:** `PROCESSING...`
+
+#### **FAZA 1: PARSOWANIE I WEKTORYZACJA (Syntax Check)**
+> Pobieranie kodu źródłowego...
+> Analiza składniowa (Python/Solidity wrapper)...
+*   **Weryfikacja definicji:** Zmienna `CONST_HARM_THRESHOLD` (próg szkodliwości) zdefiniowana poprawnie. Usunięto niedozwolony typ danych `String` ("znikoma") na rzecz `Float` (wartość liczbowa).
+*   **Weryfikacja logiki:** Struktura `IF-THEN-ELSE` dla warunku "Gwaranta" (Art. 2) jest domknięta. Brak pętli nieskończonych.
+*   **STATUS:** `OK`
+
+#### **FAZA 2: WALIDACJA Z JĄDREM SYSTEMU (Kernel Check)**
+> Ładowanie modułu: `Constitutional_Kernel_v1.0` (Konstytucja RP)
+> Skanowanie pod kątem naruszeń parametrów krytycznych:
+*   **Check 1 (Godność Człowieka - Art. 30):** Algorytm zawiera instrukcję `NeedsHumanAudit` (wymagany audyt ludzki) w przypadku oceny winy (zamiaru). Algorytm NIE ma uprawnień do automatycznego skazania na pozbawienie wolności bez zatwierdzenia przez Sędziego-Audytora.
+    *   *Wynik:* Zgodność potwierdzona. Bezpiecznik "Human in the Loop" aktywny.
+*   **Check 2 (Nullum crimen sine lege - Art. 42):** Kod zawiera odwołanie do `Lib_Git_Law` (timestamp zdarzenia vs wersja kodu). System nie zadziała wstecz.
+    *   *Wynik:* Zgodność potwierdzona.
+*   **STATUS:** `KERNEL VALIDATED (PASSED)`
+
+#### **FAZA 3: ŚRODOWISKO TESTOWE (Sandbox Simulation)**
+> Uruchamianie wirtualnej maszyny `Legal_Sandbox_Env_04`
+> Przeprowadzanie Stress-Testów (10 mln symulacji):
+*   **Test A (Inflacja):** Wykryto ryzyko. Sztywny próg kwotowy (100 PLN) przy inflacji 20% rocznie stanie się opresyjny.
+    *   *AUTO-FIX:* Kompilator zamienia stałą wartość `100.00` na wskaźnik dynamiczny `0.02 * MIN_WAGE` (powiązanie z płacą minimalną).
+    *   *Wynik:* Algorytm odporny na zmiany ekonomiczne.
+*   **Test B (Błąd Sensora):** Symulacja awarii danych wejściowych (brak odczytu GPS przy weryfikacji zaniechania).
+    *   *Wynik:* System poprawnie wyrzucił wyjątek `DataIntegrityError` i wstrzymał oskarżenie (zasada *in dubio pro reo* zaimplementowana w kodzie).
+*   **STATUS:** `SANDBOX TESTS PASSED (with 1 auto-fix)`
+
+#### **FAZA 4: GENEROWANIE KODU MASZYNOWEGO (Build)**
+> Tłumaczenie na instrukcje wykonywalne (Smart Contracts & API)...
+> Generowanie sumy kontrolnej (Hash): `SHA-256: a1b2c3d4...`
+> Przygotowanie interfejsów dla Legal HUD (wizualizacja dla obywatela).
+
+***
+
+### `>>> COMPILATION SUCCESSFUL <<<`
+
+Oto wynikowy kod (pseudokod wynikowy), który jest gotowy do wdrożenia do systemu operacyjnego państwa:
+
+```python
+# SKOMPILOWANY MODUŁ KARNY (Ready for Merge)
+
+def execute_penal_liability(user_id, act_data):
+    """
+    Automatyczna ocena odpowiedzialności karnej v.2.0
+    """
+    
+    # 1. Sprawdzenie wersji prawa w czasie rzeczywistym (Git-Law)
+    current_law = System.get_law_at_timestamp(act_data.timestamp)
+    
+    if not current_law.is_prohibited(act_data.type):
+        return System.close_case("Czyn nie był zabroniony")
+
+    # 2. Dynamiczna ocena szkodliwości (Fix z Sandboxa)
+    harm_limit = System.get_economic_index("MIN_WAGE") * 0.02
+    
+    if act_data.value < harm_limit:
+        # Automatyczne umorzenie (znikoma szkodliwość)
+        return System.send_notification(user_id, "Pouczenie: Niska szkodliwość")
+
+    # 3. Weryfikacja Gwaranta (dla zaniechania)
+    if act_data.is_omission():
+        user_role = System.get_registry_status(user_id)
+        if "GUARDIAN" not in user_role:
+             return System.close_case("Brak obowiązku prawnego")
+
+    # 4. Bezpiecznik Jądra (Wina/Zamiar) -> Human in the Loop
+    # Algorytm nie może sam orzec o winie umyślnej w sprawach złożonych
+    
+    flag_for_judge = {
+        "case_id": act_data.id,
+        "evidence": act_data.digital_trace,
+        "suggested_verdict": "GUILTY",
+        "confidence_score": 0.98
+    }
+    
+    # Przekazanie do Sędziego-Audytora celem zatwierdzenia/odrzucenia
+    return Judge.review_exception(flag_for_judge)
+```
+
+**Decyzja końcowa:**
+Czy chcesz wykonać polecenie **`git push origin main`**, aby wdrożyć to prawo i zaktualizować systemy policyjne oraz sądowe w całym kraju?
+*(Ostrzeżenie: Zmiana wejdzie w życie natychmiastowo)*.
