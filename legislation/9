@@ -1,0 +1,62 @@
+Oto pełne tłumaczenie schematu na język angielski, zachowujące strukturę techniczną i terminologię wymaganą w dokumentacji patentowej (tzw. *patent English*).
+
+**FIG. 1: Block diagram of the hardware authorization lock method (Hard-Lock)**
+
+**START**
+
+* **100: Interface Initialization (Start)**
+User logs in, selects 'New Transaction'. Form loads, 'Sign' button defaults to INACTIVE state.
+* *(Down arrow)*
+
+
+* **101: Input Parameter Acquisition**
+System identifies `User_ID` and `Transaction_Value`. Data buffering.
+* *(Down arrow)*
+
+
+* **102: Asynchronous Ledger Query**
+Query sent to Immutable Ledger: 'Is balance >= `Transaction_Value`?'
+* *(Down arrow)*
+
+
+* **103: Decision Node (Comparator)**
+Decision: Are resources available? (YES / NO)
+
+---
+
+**PATH A (Left - NO)**
+
+* **104a: Lock Signal (Hardware Interrupt)**
+Processor transmits lock signal to the HSM module.
+* *(Down arrow)*
+
+
+* **104b: Interface State (UI Lock)**
+'Sign' button remains GRAYED/INACTIVE. Error message displayed.
+* *(Down arrow)*
+
+
+* **END (STOP)**
+No signature generated. Transaction aborted.
+
+---
+
+**PATH B (Right - YES)**
+
+* **105a: Unlock Signal (Release Lock)**
+Processor transmits session token to HSM.
+* *(Down arrow)*
+
+
+* **105b: Interface State (UI Active)**
+'Sign' button changes color to GREEN/ACTIVE.
+* *(Down arrow)*
+
+
+* **106: Signature Generation (Execution)**
+User clicks, HSM generates cryptographic signature.
+* *(Down arrow)*
+
+
+* **107: Propagation**
+Signed transaction broadcast to network/ledger.
